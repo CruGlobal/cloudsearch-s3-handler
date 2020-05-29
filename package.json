@@ -1,0 +1,22 @@
+{
+  "name": "cloudsearch-s3-handler",
+  "version": "1.0.0",
+  "description": "Lambda function to read from an S3 bucket, format into indexes, and send to AWS CloudSearch",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CruGlobal/cloudsearch-s3-handler.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CruGlobal/cloudsearch-s3-handler/issues"
+  },
+  "homepage": "https://github.com/CruGlobal/cloudsearch-s3-handler#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  }
+}
