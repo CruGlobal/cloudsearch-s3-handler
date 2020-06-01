@@ -1,0 +1,74 @@
+service: cloudsearch-s3-handler
+
+provider:
+  name: aws
+  stage: ${env:ENVIRONMENT}
+  runtime: nodejs12.x
+  region: us-east-1
+  vpc:
+    securityGroupIds:
+      - ${file(${env:ECS_CONFIG}/bin/vars.yml):us-east-1.webapp_elb_sg}
+    subnetIds: ${file(${env:ECS_CONFIG}/bin/vars.yml):us-east-1.prod_apps_1_all}
+  stackTags:
+    Name: ${env:PROJECT_NAME}-${self:custom.environmentMap.${env:ENVIRONMENT}}
+    owner: apps@cru.org
+    application: ${env:PROJECT_NAME}
+    env: ${self:custom.environmentMap.${env:ENVIRONMENT}}
+    managed_by: serverless-framework
+    function: lambda
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - CloudDearch:Document
+      Resource: ${env:CLOUDSEARCH_DOMAIN_ARN}
+    - Effect: Allow
+      Action:
+        - S3:GetObject
+        - S3:ListBucket
+      Resource:
+        - arn:aws:s3:::${env:S3_BUCKET_NAME}
+        - arn:aws:s3:::${env:S3_BUCKET_NAME}/*
+  environment: ${file(serverless/environment.js)}
+
+functions:
+  s3event:
+    handler: handlers/event.handler
+    events:
+      - s3:
+          # See https://www.serverless.com/framework/docs/providers/aws/events/s3/
+          bucket: ${env:S3_BUCKET_NAME}
+          existing: true
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .html
+
+package:
+  individually: true
+  exclude:
+    - .git/**
+    - test/**
+    - '**/*.test.js'
+    - .deployment/**
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+    packager: yarn
+    excludeFiles: '**/*.test.js'
+  environmentMap:
+    production: prod
+    staging: stage
+    development: dev
+    lab: lab
+
+resources:
+  Resources:
+    IamRoleLambdaExecution:
+      Properties:
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess
