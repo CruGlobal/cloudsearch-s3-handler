@@ -1,9 +1,10 @@
 const aws = require("aws-sdk");
-// const env = require("./.env")
+//awaiting credentials for config file
+// const config = require("./config.json");
 
 (async function() {
     try {
-
+        
         aws.config.setPromisesDependency();
 
         aws.config.update({
@@ -14,14 +15,15 @@ const aws = require("aws-sdk");
 
         const s3 = new aws.S3();
         const response = await s3.listObjectsV2({
-            Bucket: "cru.org-storylines"
-        });
+            Bucket: "cru.org-storylines/index.html"
+        }).promise();
 
-        console.log(response)
+        console.log(response);
 
-        debugger;
 
     } catch (e) {
-        console.log("our error", e);
+        console.log("our error", e)
     }
-})
+
+    debugger;
+})();

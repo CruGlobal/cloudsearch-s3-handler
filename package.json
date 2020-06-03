@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/CruGlobal/cloudsearch-s3-handler#readme",
   "dependencies": {
+    "aws-sdk": "^2.688.0",
     "dotenv": "^8.2.0"
   }
 }
