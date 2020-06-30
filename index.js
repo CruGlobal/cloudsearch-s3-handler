@@ -14,7 +14,7 @@ const aws = require("aws-sdk");
 
         const s3 = new aws.S3();
         const response = await s3.listObjectsV2({
-            Bucket: "cru.org-storylines"
+            Bucket: process.env.BUCKET
         }).promise();
 
         console.log(response);
@@ -23,6 +23,10 @@ const aws = require("aws-sdk");
     } catch (e) {
         console.log("our error", e)
     }
+
+    console.log(`Access: ${process.env.ACCESS}`);
+    console.log(`Secret: ${process.env.SECRET}`);
+    console.log(`Bucket: ${process.env.BUCKET}`);
 
     debugger;
 })();
