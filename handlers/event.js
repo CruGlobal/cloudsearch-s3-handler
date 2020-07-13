@@ -24,19 +24,13 @@ export const handler = async (lambdaEvent) => {
     const srcBucket = lambdaEvent['Records'][0].s3.bucket.name
     const srcKey = decodeURIComponent(lambdaEvent.Records[0].s3.object.key.replace(/\+/g, ' '))
 
-    let document
-    try {
-      const params = {
-        Bucket: srcBucket,
-        Key: srcKey
-      }
-
-      document = await s3.getObject(params).promise()
-      await handleDocument(document)
-    } catch (error) {
-      await rollbar.error(`Failed to get object from S3: ${error}`)
-      return
+    const params = {
+      Bucket: srcBucket,
+      Key: srcKey
     }
+
+    let document = await s3.getObject(params).promise()
+    await handleDocument(document)
     return 'true'
   } catch (error) {
     await rollbar.error('handler error', error, { lambdaEvent })
