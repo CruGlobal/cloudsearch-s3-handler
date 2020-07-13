@@ -22,9 +22,6 @@ describe('Event Handler', () => {
   })
 
   it('handles a simple html file', async () => {
-    lambdaEvent.Records[0].s3.bucket.name = process.env['BUCKET']
-    lambdaEvent.Records[0].s3.bucket.arn = `arn:aws:s3:::${process.env['BUCKET']}`
-
     expect.assertions(1)
     const response = await eventHandler.handler(lambdaEvent)
     expect(response).toEqual('true')
