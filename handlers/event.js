@@ -12,9 +12,7 @@ const cloudsearch = new AWS.CloudSearchDomain({ endpoint: process.env['CLOUDSEAR
 export const handler = async (lambdaEvent) => {
   const parseDocument = async (document) => {
     // TODO: Implement
-    return {
-      path: 'https://some-site.com/path.html'
-    }
+    return document
   }
 
   const buildId = (pageUrl) => {

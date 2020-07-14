@@ -24,9 +24,37 @@ AWS.S3.prototype = {
       return {
         promise: () => Promise.reject(new Error('Failed to get object.'))
       }
+    } else if (params.Key === 'uploadFail') {
+      // Note: this is not a realistic response, but will make testing easier until the parsing is done
+      // TODO: Rework when parsing logic is complete
+      return {
+        promise: () => Promise.resolve({
+          path: 'fail'
+        })
+      }
+    } else if (params.Key === 'longUrl') {
+      return {
+        promise: () => Promise.resolve({
+          path: 'https://some-site.com/path/which-is/super-long/and/has-to-be-hashed/lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed-do.html'
+        })
+      }
+    } else if (params.Key === 'warnings') {
+      return {
+        promise: () => Promise.resolve({
+          path: 'warnings'
+        })
+      }
+    } else if (params.Key === 'adds') {
+      return {
+        promise: () => Promise.resolve({
+          path: 'adds'
+        })
+      }
     } else {
       return {
-        promise: () => Promise.resolve({})
+        promise: () => Promise.resolve({
+          path: 'https://some-site.com/path.html'
+        })
       }
     }
   }
@@ -52,6 +80,29 @@ AWS.CloudSearchDomain.prototype = {
       const document = JSON.parse(params.documents)
       if (document.id === 'fail') {
         callback(new Error('Error for the purpose of unit testing'))
+      } else if (document.id === 'warnings') {
+        const successResponse = {
+          status: 'Success With Warnings',
+          adds: 1,
+          deletes: 0,
+          warnings: [{ message: 'Warning!' }]
+        }
+        callback(null, successResponse)
+      } else if (document.id === 'adds') {
+        const successResponse = {
+          status: 'Success With Too Many Adds',
+          adds: 2,
+          deletes: 0,
+          warnings: []
+        }
+        callback(null, successResponse)
+      } else if (document.id.indexOf('http') === -1) {
+        const successResponse = {
+          status: 'Successful Hashed',
+          adds: 1,
+          deletes: 0
+        }
+        callback(null, successResponse)
       } else {
         const successResponse = {
           status: 'Success',
