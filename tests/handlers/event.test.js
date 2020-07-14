@@ -1,10 +1,9 @@
 'use strict'
 
 import rollbar from '../../config/rollbar'
-
-const eventHandler = require('../../handlers/event')
-const fs = require('fs')
-const path = require('path')
+import { handler } from '../../handlers/event'
+import fs from 'fs'
+import path from 'path'
 
 /* global __fixturesDir */
 
@@ -18,19 +17,19 @@ describe('Event Handler', () => {
   })
 
   it('is defined', () => {
-    expect(eventHandler).toBeDefined()
+    expect(handler).toBeDefined()
   })
 
   it('handles a simple html file', async () => {
     expect.assertions(1)
-    const response = await eventHandler.handler(lambdaEvent)
+    const response = await handler(lambdaEvent)
     expect(response).toEqual('true')
   })
 
   it('logs to rollbar in case of an error', done => {
     lambdaEvent.Records[0].s3.object.key = 'fail'
 
-    eventHandler.handler(lambdaEvent).then(() => {
+    handler(lambdaEvent).then(() => {
       done.fail()
     }).catch(() => {
       console.log(JSON.stringify(rollbar))
