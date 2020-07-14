@@ -32,5 +32,38 @@ AWS.S3.prototype = {
   }
 }
 
+AWS.CloudSearchDomain = function (endpoint) {
+  this.endpoint = endpoint
+}
+
+AWS.CloudSearchDomain.prototype = {
+  ...AWS.CloudSearchDomain.prototype,
+
+  uploadDocuments: (params, callback) => {
+    if (params.contentType) {
+      if (params.contentType !== 'application/json' && params.contentType !== 'application/xml') {
+        callback(new Error('Invalid content type'))
+      }
+    } else {
+      callback(new Error('Content type is required'))
+    }
+
+    if (params.documents) {
+      const document = JSON.parse(params.documents)
+      if (document.id === 'fail') {
+        callback(new Error('Error for the purpose of unit testing'))
+      } else {
+        const successResponse = {
+          status: 'Success',
+          adds: 1,
+          deletes: 0,
+          warnings: []
+        }
+        callback(null, successResponse)
+      }
+    }
+  }
+}
+
 // Export my AWS function so it can be referenced via requires
 module.exports = AWS
