@@ -1,7 +1,7 @@
 'use strict'
 
 import rollbar from '../../config/rollbar'
-import { handler } from '../../handlers/event'
+import { handler, buildId, sendToCloudsearch } from '../../handlers/event'
 import fs from 'fs'
 import path from 'path'
 
@@ -41,7 +41,7 @@ describe('Event Handler', () => {
     })
   })
 
-  it('should throw an error', done => {
+  it('should throw an error if there is a problem uploading the search document', done => {
     lambdaEvent.Records[0].s3.object.key = 'uploadFail'
 
     handler(lambdaEvent).then(() => {
@@ -55,27 +55,32 @@ describe('Event Handler', () => {
     })
   })
 
-  it('should hash the id before sending to CloudSearch if it is too long', async () => {
-    lambdaEvent.Records[0].s3.object.key = 'longUrl'
+  describe('buildId', () => {
+    it('should hash the id before sending to CloudSearch if it is too long', () => {
+      const pageUrl = 'https://some-site.com/path/which-is/super-long/and/has-to-be-hashed/lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed-do.html'
 
-    expect.assertions(1)
-    const response = await handler(lambdaEvent)
-    expect(response).toEqual('true')
+      const id = buildId(pageUrl)
+      expect(id).not.toEqual(pageUrl)
+    })
   })
 
-  it('should send warnings to Rollbar if there are warnings', async () => {
-    lambdaEvent.Records[0].s3.object.key = 'warnings'
-    expect.assertions(2)
-    const response = await handler(lambdaEvent)
-    expect(response).toEqual('true')
-    expect(rollbar.warn).toHaveBeenCalledWith('Warning from batch upload: Warning!')
-  })
+  describe('sendToCloudSearch', () => {
+    it('should send warnings to Rollbar if there are warnings', async () => {
+      const searchObject = {
+        path: 'warnings'
+      }
+      expect.assertions(1)
+      await sendToCloudsearch(searchObject)
+      expect(rollbar.warn).toHaveBeenCalledWith('Warning from batch upload: Warning!')
+    })
 
-  it('should send a warning to Rollbar if the successful adds is not 1', async () => {
-    lambdaEvent.Records[0].s3.object.key = 'adds'
-    expect.assertions(2)
-    const response = await handler(lambdaEvent)
-    expect(response).toEqual('true')
-    expect(rollbar.warn).toHaveBeenCalledWith('We sent 1 add document, but 2 documents were added.')
+    it('should send a warning to Rollbar if the successful adds is not 1', async () => {
+      const searchObject = {
+        path: 'adds'
+      }
+      expect.assertions(1)
+      await sendToCloudsearch(searchObject)
+      expect(rollbar.warn).toHaveBeenCalledWith('We sent 1 add document, but 2 documents were added.')
+    })
   })
 })

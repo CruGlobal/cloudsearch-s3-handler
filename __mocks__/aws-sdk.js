@@ -32,24 +32,6 @@ AWS.S3.prototype = {
           path: 'fail'
         })
       }
-    } else if (params.Key === 'longUrl') {
-      return {
-        promise: () => Promise.resolve({
-          path: 'https://some-site.com/path/which-is/super-long/and/has-to-be-hashed/lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed-do.html'
-        })
-      }
-    } else if (params.Key === 'warnings') {
-      return {
-        promise: () => Promise.resolve({
-          path: 'warnings'
-        })
-      }
-    } else if (params.Key === 'adds') {
-      return {
-        promise: () => Promise.resolve({
-          path: 'adds'
-        })
-      }
     } else {
       return {
         promise: () => Promise.resolve({
@@ -92,14 +74,6 @@ AWS.CloudSearchDomain.prototype = {
         const successResponse = {
           status: 'Success With Too Many Adds',
           adds: 2,
-          deletes: 0,
-          warnings: []
-        }
-        callback(null, successResponse)
-      } else if (document.id.indexOf('http') === -1) {
-        const successResponse = {
-          status: 'Successful Hashed',
-          adds: 1,
           deletes: 0
         }
         callback(null, successResponse)
