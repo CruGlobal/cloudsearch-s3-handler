@@ -18,7 +18,7 @@ const handleDocument = async (document) => {
   }
 }
 
-const handler = async (lambdaEvent) => {
+export const handler = async (lambdaEvent) => {
   try {
     const srcBucket = lambdaEvent['Records'][0].s3.bucket.name
     const srcKey = decodeURIComponent(lambdaEvent.Records[0].s3.object.key.replace(/\+/g, ' '))
@@ -35,9 +35,4 @@ const handler = async (lambdaEvent) => {
     await rollbar.error('handler error', error, { lambdaEvent })
     throw error
   }
-}
-
-module.exports = {
-  handler: handler,
-  handleDocument: handleDocument
 }

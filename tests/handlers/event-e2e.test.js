@@ -1,6 +1,6 @@
 'use strict'
 
-import eventHandler from '../../handlers/event'
+import * as eventHandler from '../../handlers/event'
 import cloudsearchService from '../../services/cloudsearch-service'
 import fs from 'fs'
 import path from 'path'
