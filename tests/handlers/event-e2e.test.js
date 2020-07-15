@@ -1,6 +1,7 @@
 'use strict'
 
 import eventHandler from '../../handlers/event'
+import cloudsearchService from '../../services/cloudsearch-service'
 import fs from 'fs'
 import path from 'path'
 
@@ -16,7 +17,7 @@ describe('Event Handler End to End', () => {
     lambdaEvent['Records'][0].s3.bucket.arn = `arn:aws:s3:::${process.env['BUCKET']}`
     lambdaEvent['Records'][0].s3.object.key = 'index.html'
 
-    jest.spyOn(eventHandler, 'sendToCloudsearch').mockImplementation(() => {})
+    jest.spyOn(cloudsearchService, 'sendToCloudsearch').mockImplementation(() => {})
 
     expect.assertions(1)
     const response = await eventHandler.handler(lambdaEvent)
