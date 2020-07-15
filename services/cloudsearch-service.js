@@ -23,7 +23,6 @@ const buildId = (pageUrl) => {
  * Sends the already-parsed data to CloudSearch.
  *
  * @param searchObject an object with all the desired fields to send to CloudSearch
- * @returns {Promise<void>}
  */
 const sendToCloudsearch = async (searchObject) => {
   const searchDocument = [{
@@ -36,20 +35,16 @@ const sendToCloudsearch = async (searchObject) => {
     documents: JSON.stringify(searchDocument)
   }
 
-  cloudsearch.uploadDocuments(cloudsearchRequest, (err, data) => {
-    if (err) {
-      throw err
-    }
-    if (data.warnings) {
-      data.warnings.map(warning => {
-        rollbar.warn(`Warning from batch upload: ${warning.message}`)
-      })
-    }
-    if (data.adds !== 1) {
-      rollbar.warn(`We sent 1 add document, but ${data.adds} documents were added.`)
-    }
-    return `Added ${data.adds} documents.`
-  })
+  const data = await cloudsearch.uploadDocuments(cloudsearchRequest).promise()
+  if (data.warnings) {
+    data.warnings.map(warning => {
+      rollbar.warn(`Warning from batch upload: ${warning.message}`)
+    })
+  }
+  if (data.adds !== 1) {
+    rollbar.warn(`We sent 1 add document, but ${data.adds} documents were added.`)
+  }
+  return `Added ${data.adds} documents.`
 }
 
 module.exports = {
