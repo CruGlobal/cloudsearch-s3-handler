@@ -5,7 +5,7 @@ import AWS from 'aws-sdk'
 import crypto from 'crypto'
 
 const MAX_ID_SIZE = 128
-const cloudsearch = new AWS.CloudSearchDomain({ endpoint: process.env['CLOUDSEARCH_DOMAIN_ARN'] })
+const cloudsearch = new AWS.CloudSearchDomain({ endpoint: process.env['CLOUDSEARCH_DOCUMENT_ENDPOINT'] })
 
 /**
  * Returns either the page URL or an MD5 hashed ID if the URL is longer than 128 characters.
