@@ -26,11 +26,11 @@ const buildId = (pageUrl) => {
  * @returns {Promise<void>}
  */
 const sendToCloudsearch = async (searchObject) => {
-  const searchDocument = {
+  const searchDocument = [{
     id: buildId(searchObject.path),
     type: 'add',
     fields: searchObject
-  }
+  }]
   const cloudsearchRequest = {
     contentType: 'application/json',
     documents: JSON.stringify(searchDocument)
