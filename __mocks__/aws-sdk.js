@@ -1,6 +1,13 @@
 /**
  * Modified from https://derikwhittaker.blog/2018/02/20/using-manual-mocks-to-test-the-aws-sdk-with-jest/
  */
+
+import fs from 'fs'
+import path from 'path'
+
+/* global __fixturesDir */
+
+const mockHtml = fs.readFileSync(path.join(__fixturesDir, 'mock-s3-event.json'))
 const AWS = {}
 
 // This here is to allow/prevent runtime errors if you are using
@@ -29,13 +36,24 @@ AWS.S3.prototype = {
       // TODO: Rework when parsing logic is complete
       return {
         promise: () => Promise.resolve({
-          path: 'fail'
+          path: 'fail',
+          ContentType: 'text/html',
+          Body: mockHtml
+        })
+      }
+    } else if (params.Key === 'image') {
+      return {
+        promise: () => Promise.resolve({
+          path: 'https://some-site.com/image.jpg',
+          ContentType: 'image/jpeg'
         })
       }
     } else {
       return {
         promise: () => Promise.resolve({
-          path: 'https://some-site.com/path.html'
+          path: 'https://some-site.com/path.html',
+          ContentType: 'text/html',
+          Body: mockHtml
         })
       }
     }

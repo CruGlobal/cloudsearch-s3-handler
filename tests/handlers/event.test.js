@@ -1,7 +1,7 @@
 'use strict'
 
 import rollbar from '../../config/rollbar'
-import { handler, buildId, sendToCloudsearch } from '../../handlers/event'
+import eventHandler, { handler, buildId, sendToCloudsearch } from '../../handlers/event'
 import fs from 'fs'
 import path from 'path'
 
@@ -24,6 +24,18 @@ describe('Event Handler', () => {
     expect.assertions(1)
     const response = await handler(lambdaEvent)
     expect(response).toEqual('true')
+  })
+
+  it('skips an image', async () => {
+    jest.spyOn(eventHandler, 'sendToCloudsearch').mockImplementation(() => {})
+    jest.spyOn(eventHandler, 'parseDocument').mockImplementation(() => {})
+
+    lambdaEvent.Records[0].s3.object.key = 'image'
+
+    expect.assertions(2)
+    await eventHandler.handler(lambdaEvent)
+    expect(eventHandler.parseDocument).not.toHaveBeenCalled()
+    expect(eventHandler.sendToCloudsearch).not.toHaveBeenCalled()
   })
 
   it('logs to rollbar in case of an error', done => {

@@ -9,6 +9,9 @@ const MAX_ID_SIZE = 128
 const s3 = new AWS.S3()
 const cloudsearch = new AWS.CloudSearchDomain({ endpoint: process.env['CLOUDSEARCH_DOMAIN_ARN'] })
 
+/**
+ * Returns either the page URL or an MD5 hashed ID if the URL is longer than 128 characters.
+ */
 const buildId = (pageUrl) => {
   if (pageUrl.length > MAX_ID_SIZE) {
     let id = pageUrl
@@ -18,6 +21,12 @@ const buildId = (pageUrl) => {
   return pageUrl
 }
 
+/**
+ * Sends the already-parsed data to CloudSearch.
+ *
+ * @param searchObject an object with all the desired fields to send to CloudSearch
+ * @returns {Promise<void>}
+ */
 const sendToCloudsearch = async (searchObject) => {
   const searchDocument = {
     id: buildId(searchObject.path),
@@ -45,15 +54,25 @@ const sendToCloudsearch = async (searchObject) => {
   })
 }
 
+/**
+ * Parses the S3 document into the fields we care about for CloudSearch.
+ * @param document an object from S3 with metadata and HTTP response data
+ * @returns the parsed data as an object
+ */
 const parseDocument = async (document) => {
   // TODO: Implement
   return document
 }
 
+/**
+ * Handles an incoming S3 response (from s3.getObject()).
+ */
 const handleDocument = async (document) => {
   // TODO: Implement
-  const searchObject = await parseDocument(document)
-  await sendToCloudsearch(searchObject)
+  if (document.ContentType === 'text/html') {
+    const searchObject = await parseDocument(document)
+    await sendToCloudsearch(searchObject)
+  }
 }
 
 const handler = async (lambdaEvent) => {
