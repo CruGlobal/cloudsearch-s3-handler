@@ -24,9 +24,67 @@ AWS.S3.prototype = {
       return {
         promise: () => Promise.reject(new Error('Failed to get object.'))
       }
+    } else if (params.Key === 'uploadFail') {
+      // Note: this is not a realistic response, but will make testing easier until the parsing is done
+      // TODO: Rework when parsing logic is complete
+      return {
+        promise: () => Promise.resolve({
+          path: 'fail'
+        })
+      }
     } else {
       return {
-        promise: () => Promise.resolve({})
+        promise: () => Promise.resolve({
+          path: 'https://some-site.com/path.html'
+        })
+      }
+    }
+  }
+}
+
+AWS.CloudSearchDomain = function (endpoint) {
+  this.endpoint = endpoint
+}
+
+AWS.CloudSearchDomain.prototype = {
+  ...AWS.CloudSearchDomain.prototype,
+
+  uploadDocuments: (params, callback) => {
+    if (params.contentType) {
+      if (params.contentType !== 'application/json' && params.contentType !== 'application/xml') {
+        callback(new Error('Invalid content type'))
+      }
+    } else {
+      callback(new Error('Content type is required'))
+    }
+
+    if (params.documents) {
+      const document = JSON.parse(params.documents)
+      if (document.id === 'fail') {
+        callback(new Error('Error for the purpose of unit testing'))
+      } else if (document.id === 'warnings') {
+        const successResponse = {
+          status: 'Success With Warnings',
+          adds: 1,
+          deletes: 0,
+          warnings: [{ message: 'Warning!' }]
+        }
+        callback(null, successResponse)
+      } else if (document.id === 'adds') {
+        const successResponse = {
+          status: 'Success With Too Many Adds',
+          adds: 2,
+          deletes: 0
+        }
+        callback(null, successResponse)
+      } else {
+        const successResponse = {
+          status: 'Success',
+          adds: 1,
+          deletes: 0,
+          warnings: []
+        }
+        callback(null, successResponse)
       }
     }
   }
