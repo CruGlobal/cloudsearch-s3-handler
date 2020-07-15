@@ -29,13 +29,22 @@ AWS.S3.prototype = {
       // TODO: Rework when parsing logic is complete
       return {
         promise: () => Promise.resolve({
-          path: 'fail'
+          path: 'fail',
+          ContentType: 'text/html'
+        })
+      }
+    } else if (params.Key === 'image') {
+      return {
+        promise: () => Promise.resolve({
+          path: 'https://some-site.com/image.jpg',
+          ContentType: 'image/jpeg'
         })
       }
     } else {
       return {
         promise: () => Promise.resolve({
-          path: 'https://some-site.com/path.html'
+          path: 'https://some-site.com/path.html',
+          ContentType: 'text/html'
         })
       }
     }

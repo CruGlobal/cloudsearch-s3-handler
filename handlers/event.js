@@ -52,8 +52,10 @@ const parseDocument = async (document) => {
 
 const handleDocument = async (document) => {
   // TODO: Implement
-  const searchObject = await parseDocument(document)
-  await sendToCloudsearch(searchObject)
+  if (document.ContentType === 'text/html') {
+    const searchObject = await parseDocument(document)
+    await sendToCloudsearch(searchObject)
+  }
 }
 
 const handler = async (lambdaEvent) => {
