@@ -3,6 +3,7 @@
 import rollbar from '../../config/rollbar'
 import eventHandler from '../../handlers/event'
 import cloudsearchService from '../../services/cloudsearch-service'
+import parsingService from '../../services/parsing-service'
 import fs from 'fs'
 import path from 'path'
 
@@ -29,13 +30,13 @@ describe('Event eventHandler.handler', () => {
 
   it('skips an image', async () => {
     jest.spyOn(cloudsearchService, 'sendToCloudsearch').mockImplementation(() => {})
-    jest.spyOn(eventHandler, 'parseDocument').mockImplementation(() => {})
+    jest.spyOn(parsingService, 'parseDocument').mockImplementation(() => {})
 
     lambdaEvent.Records[0].s3.object.key = 'image'
 
     expect.assertions(2)
     await eventHandler.handler(lambdaEvent)
-    expect(eventHandler.parseDocument).not.toHaveBeenCalled()
+    expect(parsingService.parseDocument).not.toHaveBeenCalled()
     expect(cloudsearchService.sendToCloudsearch).not.toHaveBeenCalled()
   })
 

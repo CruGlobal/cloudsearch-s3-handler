@@ -3,18 +3,9 @@
 import rollbar from '../config/rollbar'
 import AWS from 'aws-sdk'
 import cloudsearchService from '../services/cloudsearch-service'
+import parsingService from '../services/parsing-service'
 
 const s3 = new AWS.S3()
-
-/**
- * Parses the S3 document into the fields we care about for CloudSearch.
- * @param document an object from S3 with metadata and HTTP response data
- * @returns the parsed data as an object
- */
-const parseDocument = async (document) => {
-  // TODO: Implement
-  return document
-}
 
 /**
  * Handles an incoming S3 response (from s3.getObject()).
@@ -22,7 +13,7 @@ const parseDocument = async (document) => {
 const handleDocument = async (document) => {
   // TODO: Implement
   if (document.ContentType === 'text/html') {
-    const searchObject = await parseDocument(document)
+    const searchObject = await parsingService.parseDocument(document)
     await cloudsearchService.sendToCloudsearch(searchObject)
   }
 }
@@ -48,6 +39,5 @@ const handler = async (lambdaEvent) => {
 
 module.exports = {
   handler: handler,
-  handleDocument: handleDocument,
-  parseDocument: parseDocument
+  handleDocument: handleDocument
 }
