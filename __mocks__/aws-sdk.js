@@ -88,6 +88,14 @@ AWS.S3.prototype = {
       return {
         promise: () => Promise.resolve(secondPage)
       }
+    } else if (params.Bucket === 'fail') {
+      return {
+        promise: () => Promise.reject(new Error('Failure for unit test'))
+      }
+    } else if (params.Bucket === 'empty') {
+      return {
+        promise: () => Promise.resolve({})
+      }
     } else {
       return {
         promise: () => Promise.resolve(firstPage)
