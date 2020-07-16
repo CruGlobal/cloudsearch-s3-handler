@@ -27,7 +27,12 @@ const handleContents = async (listObjectResponse, lastIndex) => {
   for (i = 0; i < listObjectResponse.Contents.length; i++) {
     let document = listObjectResponse.Contents[i]
     if (document.Key.endsWith('.html')) {
-      const parsed = await parsingService.parseDocument(document)
+      const params = {
+        Bucket: process.env['BUCKET'],
+        Key: document.Key
+      }
+      const realDocument = await s3.getObject(params).promise()
+      const parsed = await parsingService.parseDocument(realDocument)
       batch.push(parsed)
       console.log(`${i + lastIndex}: ${document.Key}`)
     } else {

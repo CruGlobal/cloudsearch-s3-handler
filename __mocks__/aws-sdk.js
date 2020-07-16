@@ -51,10 +51,46 @@ AWS.S3.prototype = {
     } else {
       return {
         promise: () => Promise.resolve({
-          path: 'https://some-site.com/path.html',
+          path: `https://some-site.com/${params.Key}`,
           ContentType: 'text/html',
           Body: mockHtml
         })
+      }
+    }
+  },
+
+  listObjectsV2: (params) => {
+    const firstPage = {
+      Contents: [
+        {
+          Key: 'image.jpg'
+        },
+        {
+          Key: 'page.html'
+        }
+      ],
+      NextContinuationToken: 'token',
+      IsTruncated: true
+    }
+
+    const secondPage = {
+      Contents: [
+        {
+          Key: 'img.png'
+        },
+        {
+          Key: 'another-page.html'
+        }
+      ]
+    }
+
+    if (params.ContinuationToken) {
+      return {
+        promise: () => Promise.resolve(secondPage)
+      }
+    } else {
+      return {
+        promise: () => Promise.resolve(firstPage)
       }
     }
   }
