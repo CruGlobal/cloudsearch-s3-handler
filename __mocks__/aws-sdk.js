@@ -67,19 +67,25 @@ AWS.CloudSearchDomain = function (endpoint) {
 AWS.CloudSearchDomain.prototype = {
   ...AWS.CloudSearchDomain.prototype,
 
-  uploadDocuments: (params, callback) => {
+  uploadDocuments: (params) => {
     if (params.contentType) {
       if (params.contentType !== 'application/json' && params.contentType !== 'application/xml') {
-        callback(new Error('Invalid content type'))
+        return {
+          promise: () => Promise.reject(new Error('Invalid content type'))
+        }
       }
     } else {
-      callback(new Error('Content type is required'))
+      return {
+        promise: () => Promise.reject(new Error('Content type is required'))
+      }
     }
 
     if (params.documents) {
-      const document = JSON.parse(params.documents)
+      const document = JSON.parse(params.documents)[0]
       if (document.id === 'fail') {
-        callback(new Error('Error for the purpose of unit testing'))
+        return {
+          promise: () => Promise.reject(new Error('Error for the purpose of unit testing'))
+        }
       } else if (document.id === 'warnings') {
         const successResponse = {
           status: 'Success With Warnings',
@@ -87,14 +93,18 @@ AWS.CloudSearchDomain.prototype = {
           deletes: 0,
           warnings: [{ message: 'Warning!' }]
         }
-        callback(null, successResponse)
+        return {
+          promise: () => Promise.resolve(successResponse)
+        }
       } else if (document.id === 'adds') {
         const successResponse = {
           status: 'Success With Too Many Adds',
           adds: 2,
           deletes: 0
         }
-        callback(null, successResponse)
+        return {
+          promise: () => Promise.resolve(successResponse)
+        }
       } else {
         const successResponse = {
           status: 'Success',
@@ -102,7 +112,9 @@ AWS.CloudSearchDomain.prototype = {
           deletes: 0,
           warnings: []
         }
-        callback(null, successResponse)
+        return {
+          promise: () => Promise.resolve(successResponse)
+        }
       }
     }
   }
