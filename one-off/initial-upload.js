@@ -22,9 +22,9 @@ const handleContents = async (listObjectResponse, lastIndex) => {
   }
 
   let i
-  let batch = []
+  const batch = []
   for (i = 0; i < listObjectResponse.Contents.length; i++) {
-    let document = listObjectResponse.Contents[i]
+    const document = listObjectResponse.Contents[i]
     if (document.Key.endsWith('.html')) {
       const params = {
         Bucket: process.env['BUCKET'],

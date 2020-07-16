@@ -28,7 +28,7 @@ export const handler = async (lambdaEvent) => {
       Key: srcKey
     }
 
-    let document = await s3.getObject(params).promise()
+    const document = await s3.getObject(params).promise()
     await handleDocument(document)
     return 'true'
   } catch (error) {
