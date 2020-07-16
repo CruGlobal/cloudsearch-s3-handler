@@ -24,6 +24,4 @@ const aws = require('aws-sdk');
   console.log(`Access: ${process.env.ACCESS}`)
   console.log(`Secret: ${process.env.SECRET}`)
   console.log(`Bucket: ${process.env.BUCKET}`)
-
-  debugger
 })()
