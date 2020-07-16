@@ -29,7 +29,7 @@ describe('Event eventHandler.handler', () => {
   })
 
   it('skips an image', async () => {
-    jest.spyOn(cloudsearchService, 'sendToCloudsearch').mockImplementation(() => {})
+    jest.spyOn(cloudsearchService, 'sendSingleItemToCloudsearch').mockImplementation(() => {})
     jest.spyOn(parsingService, 'parseDocument').mockImplementation(() => {})
 
     lambdaEvent.Records[0].s3.object.key = 'image'
@@ -37,7 +37,7 @@ describe('Event eventHandler.handler', () => {
     expect.assertions(2)
     await eventHandler.handler(lambdaEvent)
     expect(parsingService.parseDocument).not.toHaveBeenCalled()
-    expect(cloudsearchService.sendToCloudsearch).not.toHaveBeenCalled()
+    expect(cloudsearchService.sendSingleItemToCloudsearch).not.toHaveBeenCalled()
   })
 
   it('logs to rollbar in case of an error', done => {

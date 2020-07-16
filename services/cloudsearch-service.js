@@ -22,17 +22,12 @@ const buildId = (pageUrl) => {
 /**
  * Sends the already-parsed data to CloudSearch.
  *
- * @param searchObject an object with all the desired fields to send to CloudSearch
+ * @param searchDocuments an array of search documents to send to CloudSearch
  */
-const sendToCloudsearch = async (searchObject) => {
-  const searchDocument = [{
-    id: buildId(searchObject.path),
-    type: 'add',
-    fields: searchObject
-  }]
+const sendToCloudsearch = async (searchDocuments) => {
   const cloudsearchRequest = {
     contentType: 'application/json',
-    documents: JSON.stringify(searchDocument)
+    documents: JSON.stringify(searchDocuments)
   }
 
   const data = await cloudsearch.uploadDocuments(cloudsearchRequest).promise()
@@ -41,13 +36,44 @@ const sendToCloudsearch = async (searchObject) => {
       rollbar.warn(`Warning from batch upload: ${warning.message}`)
     })
   }
-  if (data.adds !== 1) {
-    rollbar.warn(`We sent 1 add document, but ${data.adds} documents were added.`)
-  }
   return `Added ${data.adds} documents.`
 }
 
+/**
+ * Sends the already-parsed data to CloudSearch.
+ *
+ * @param searchObject an object with all the desired fields to send to CloudSearch
+ */
+const sendSingleItemToCloudsearch = async (searchObject) => {
+  const searchDocument = [{
+    id: buildId(searchObject.path),
+    type: 'add',
+    fields: searchObject
+  }]
+
+  return sendToCloudsearch(searchDocument)
+}
+
+/**
+ * Sends a batch of already-parsed data to CloudSearch.
+ *
+ * @param searchObjects an array of objects with all the desired fields to send to CloudSearch
+ */
+const sendBatchToCloudSearch = async (searchObjects) => {
+  const searchDocument = []
+  searchObjects.map(searchObject => {
+    searchDocument.push({
+      id: buildId(searchObject.path),
+      type: 'add',
+      fields: searchObject
+    })
+  })
+
+  return sendToCloudsearch(searchDocument)
+}
+
 module.exports = {
-  sendToCloudsearch: sendToCloudsearch,
+  sendSingleItemToCloudsearch: sendSingleItemToCloudsearch,
+  sendBatchToCloudSearch: sendBatchToCloudSearch,
   buildId: buildId
 }

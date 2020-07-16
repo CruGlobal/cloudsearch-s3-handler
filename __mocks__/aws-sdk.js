@@ -81,36 +81,39 @@ AWS.CloudSearchDomain.prototype = {
     }
 
     if (params.documents) {
-      const document = JSON.parse(params.documents)[0]
-      if (document.id === 'fail') {
-        return {
-          promise: () => Promise.reject(new Error('Error for the purpose of unit testing'))
+      const documents = JSON.parse(params.documents)
+      if (documents.length === 1) {
+        const document = documents[0]
+        if (document.id === 'fail') {
+          return {
+            promise: () => Promise.reject(new Error('Error for the purpose of unit testing'))
+          }
+        } else if (document.id === 'warnings') {
+          const successResponse = {
+            status: 'Success With Warnings',
+            adds: 1,
+            deletes: 0,
+            warnings: [{ message: 'Warning!' }]
+          }
+          return {
+            promise: () => Promise.resolve(successResponse)
+          }
+        } else {
+          const successResponse = {
+            status: 'Success',
+            adds: 1,
+            deletes: 0,
+            warnings: []
+          }
+          return {
+            promise: () => Promise.resolve(successResponse)
+          }
         }
-      } else if (document.id === 'warnings') {
+      } else if (documents.length > 1) {
         const successResponse = {
-          status: 'Success With Warnings',
-          adds: 1,
-          deletes: 0,
-          warnings: [{ message: 'Warning!' }]
-        }
-        return {
-          promise: () => Promise.resolve(successResponse)
-        }
-      } else if (document.id === 'adds') {
-        const successResponse = {
-          status: 'Success With Too Many Adds',
+          status: 'Success With Multiple Adds',
           adds: 2,
           deletes: 0
-        }
-        return {
-          promise: () => Promise.resolve(successResponse)
-        }
-      } else {
-        const successResponse = {
-          status: 'Success',
-          adds: 1,
-          deletes: 0,
-          warnings: []
         }
         return {
           promise: () => Promise.resolve(successResponse)

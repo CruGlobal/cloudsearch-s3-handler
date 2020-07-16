@@ -1,7 +1,8 @@
 'use strict'
 
 import AWS from 'aws-sdk'
-import * as eventHandler from '../handlers/event'
+import cloudsearchService from '../services/cloudsearch-service'
+import parsingService from '../services/parsing-service'
 const s3 = new AWS.S3()
 
 const listObjects = async (continuationToken) => {
@@ -22,15 +23,19 @@ const handleContents = async (listObjectResponse, lastIndex) => {
   }
 
   let i
+  let batch = []
   for (i = 0; i < listObjectResponse.Contents.length; i++) {
     let document = listObjectResponse.Contents[i]
     if (document.Key.endsWith('.html')) {
-      await eventHandler.handleDocument(document)
+      const parsed = await parsingService.parseDocument(document)
+      batch.push(parsed)
       console.log(`${i + lastIndex}: ${document.Key}`)
     } else {
       console.log(`Skipping ${i + lastIndex}: ${document.Key}`)
     }
   }
+
+  await cloudsearchService.sendBatchToCloudSearch(batch)
 
   if (listObjectResponse.IsTruncated) {
     const paginatedResponse = await listObjects(listObjectResponse.NextContinuationToken)

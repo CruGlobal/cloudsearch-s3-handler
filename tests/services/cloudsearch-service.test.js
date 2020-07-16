@@ -16,23 +16,14 @@ describe('CloudSearch Service', () => {
     })
   })
 
-  describe('sendToCloudSearch', () => {
+  describe('sendSingleItemToCloudsearch', () => {
     it('should send warnings to Rollbar if there are warnings', async () => {
       const searchObject = {
         path: 'warnings'
       }
       expect.assertions(1)
-      await cloudsearchService.sendToCloudsearch(searchObject)
+      await cloudsearchService.sendSingleItemToCloudsearch(searchObject)
       expect(rollbar.warn).toHaveBeenCalledWith('Warning from batch upload: Warning!')
-    })
-
-    it('should send a warning to Rollbar if the successful adds is not 1', async () => {
-      const searchObject = {
-        path: 'adds'
-      }
-      expect.assertions(1)
-      await cloudsearchService.sendToCloudsearch(searchObject)
-      expect(rollbar.warn).toHaveBeenCalledWith('We sent 1 add document, but 2 documents were added.')
     })
 
     it('should throw an error if there is a problem uploading the search document', done => {
@@ -40,12 +31,28 @@ describe('CloudSearch Service', () => {
         path: 'fail'
       }
 
-      cloudsearchService.sendToCloudsearch(searchObject).then(() => {
+      cloudsearchService.sendSingleItemToCloudsearch(searchObject).then(() => {
         done.fail('Should have thrown an error')
       }).catch((err) => {
         expect(err).toEqual(new Error('Error for the purpose of unit testing'))
         done()
       })
+    })
+  })
+
+  describe('sendBatchToCloudsearch', () => {
+    it('should send a batch to CloudSearch', async () => {
+      const searchObjects = [
+        {
+          path: 'adds'
+        },
+        {
+          path: 'second-path'
+        }
+      ]
+      expect.assertions(1)
+      const response = await cloudsearchService.sendBatchToCloudSearch(searchObjects)
+      expect(response).toEqual('Added 2 documents.')
     })
   })
 })

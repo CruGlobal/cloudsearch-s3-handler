@@ -14,7 +14,7 @@ const handleDocument = async (document) => {
   // TODO: Implement
   if (document.ContentType === 'text/html') {
     const searchObject = await parsingService.parseDocument(document)
-    await cloudsearchService.sendToCloudsearch(searchObject)
+    await cloudsearchService.sendSingleItemToCloudsearch(searchObject)
   }
 }
 
