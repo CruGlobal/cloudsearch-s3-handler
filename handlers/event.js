@@ -36,3 +36,8 @@ export const handler = async (lambdaEvent) => {
     throw error
   }
 }
+
+module.exports = {
+  handler: handler,
+  handleDocument: handleDocument
+}
