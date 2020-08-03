@@ -31,7 +31,7 @@ const handleContents = async (listObjectResponse, lastIndex) => {
         Key: document.Key
       }
       const realDocument = await s3.getObject(params).promise()
-      const parsed = await parsingService.parseDocument(realDocument)
+      const parsed = await parsingService.parseDocument(realDocument, document.Key)
       batch.push(parsed)
       console.log(`${i + lastIndex}: ${document.Key}`)
     } else {
