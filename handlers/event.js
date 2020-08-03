@@ -12,7 +12,7 @@ const s3 = new AWS.S3()
  */
 const handleDocument = async (document, srcKey) => {
   if (document.ContentType === 'text/html') {
-    const searchObject = await parsingService.parseDocument(document, srcKey)
+    const searchObject = await parsingService.parseDocument(document.Body.toString(), srcKey)
     await cloudsearchService.sendSingleItemToCloudsearch(searchObject)
   }
 }
