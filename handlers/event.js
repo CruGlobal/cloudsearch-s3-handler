@@ -14,7 +14,7 @@ const handleDocument = async (document) => {
   // TODO: Implement
   if (document.ContentType === 'text/html') {
     const searchObject = await parsingService.parseDocument(document)
-    await cloudsearchService.sendToCloudsearch(searchObject)
+    await cloudsearchService.sendSingleItemToCloudsearch(searchObject)
   }
 }
 
@@ -28,11 +28,16 @@ export const handler = async (lambdaEvent) => {
       Key: srcKey
     }
 
-    let document = await s3.getObject(params).promise()
+    const document = await s3.getObject(params).promise()
     await handleDocument(document)
     return 'true'
   } catch (error) {
     await rollbar.error('handler error', error, { lambdaEvent })
     throw error
   }
+}
+
+module.exports = {
+  handler: handler,
+  handleDocument: handleDocument
 }

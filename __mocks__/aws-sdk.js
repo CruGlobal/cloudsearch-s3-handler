@@ -51,10 +51,54 @@ AWS.S3.prototype = {
     } else {
       return {
         promise: () => Promise.resolve({
-          path: 'https://some-site.com/path.html',
+          path: `https://some-site.com/${params.Key}`,
           ContentType: 'text/html',
           Body: mockHtml
         })
+      }
+    }
+  },
+
+  listObjectsV2: (params) => {
+    const firstPage = {
+      Contents: [
+        {
+          Key: 'image.jpg'
+        },
+        {
+          Key: 'page.html'
+        }
+      ],
+      NextContinuationToken: 'token',
+      IsTruncated: true
+    }
+
+    const secondPage = {
+      Contents: [
+        {
+          Key: 'img.png'
+        },
+        {
+          Key: 'another-page.html'
+        }
+      ]
+    }
+
+    if (params.ContinuationToken) {
+      return {
+        promise: () => Promise.resolve(secondPage)
+      }
+    } else if (params.Bucket === 'fail') {
+      return {
+        promise: () => Promise.reject(new Error('Failure for unit test'))
+      }
+    } else if (params.Bucket === 'empty') {
+      return {
+        promise: () => Promise.resolve({})
+      }
+    } else {
+      return {
+        promise: () => Promise.resolve(firstPage)
       }
     }
   }
@@ -67,42 +111,57 @@ AWS.CloudSearchDomain = function (endpoint) {
 AWS.CloudSearchDomain.prototype = {
   ...AWS.CloudSearchDomain.prototype,
 
-  uploadDocuments: (params, callback) => {
+  uploadDocuments: (params) => {
     if (params.contentType) {
       if (params.contentType !== 'application/json' && params.contentType !== 'application/xml') {
-        callback(new Error('Invalid content type'))
+        return {
+          promise: () => Promise.reject(new Error('Invalid content type'))
+        }
       }
     } else {
-      callback(new Error('Content type is required'))
+      return {
+        promise: () => Promise.reject(new Error('Content type is required'))
+      }
     }
 
     if (params.documents) {
-      const document = JSON.parse(params.documents)
-      if (document.id === 'fail') {
-        callback(new Error('Error for the purpose of unit testing'))
-      } else if (document.id === 'warnings') {
-        const successResponse = {
-          status: 'Success With Warnings',
-          adds: 1,
-          deletes: 0,
-          warnings: [{ message: 'Warning!' }]
+      const documents = JSON.parse(params.documents)
+      if (documents.length === 1) {
+        const document = documents[0]
+        if (document.id === 'fail') {
+          return {
+            promise: () => Promise.reject(new Error('Error for the purpose of unit testing'))
+          }
+        } else if (document.id === 'warnings') {
+          const successResponse = {
+            status: 'Success With Warnings',
+            adds: 1,
+            deletes: 0,
+            warnings: [{ message: 'Warning!' }]
+          }
+          return {
+            promise: () => Promise.resolve(successResponse)
+          }
+        } else {
+          const successResponse = {
+            status: 'Success',
+            adds: 1,
+            deletes: 0,
+            warnings: []
+          }
+          return {
+            promise: () => Promise.resolve(successResponse)
+          }
         }
-        callback(null, successResponse)
-      } else if (document.id === 'adds') {
+      } else if (documents.length > 1) {
         const successResponse = {
-          status: 'Success With Too Many Adds',
+          status: 'Success With Multiple Adds',
           adds: 2,
           deletes: 0
         }
-        callback(null, successResponse)
-      } else {
-        const successResponse = {
-          status: 'Success',
-          adds: 1,
-          deletes: 0,
-          warnings: []
+        return {
+          promise: () => Promise.resolve(successResponse)
         }
-        callback(null, successResponse)
       }
     }
   }
