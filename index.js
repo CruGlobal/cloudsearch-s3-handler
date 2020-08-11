@@ -13,7 +13,7 @@ const aws = require('aws-sdk');
 
     const s3 = new aws.S3()
     const response = await s3.listObjectsV2({
-      Bucket: process.env.BUCKET
+      Bucket: process.env['S3_BUCKET_NAME']
     }).promise()
 
     console.log(response)
@@ -23,5 +23,5 @@ const aws = require('aws-sdk');
 
   console.log(`Access: ${process.env.ACCESS}`)
   console.log(`Secret: ${process.env.SECRET}`)
-  console.log(`Bucket: ${process.env.BUCKET}`)
+  console.log(`Bucket: ${process.env['S3_BUCKET_NAME']}`)
 })()
