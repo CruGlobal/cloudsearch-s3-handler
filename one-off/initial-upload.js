@@ -27,7 +27,7 @@ const handleContents = async (listObjectResponse, lastIndex) => {
     const document = listObjectResponse.Contents[i]
     if (document.Key.endsWith('.html')) {
       const params = {
-        Bucket: process.env['BUCKET'],
+        Bucket: process.env['S3_BUCKET_NAME'],
         Key: document.Key
       }
       const realDocument = await s3.getObject(params).promise()
@@ -49,7 +49,7 @@ const handleContents = async (listObjectResponse, lastIndex) => {
 
 module.exports = async (s3Bucket) => {
   try {
-    const listObjectResponse = await listObjects(null, s3Bucket || process.env['BUCKET'])
+    const listObjectResponse = await listObjects(null, s3Bucket || process.env['S3_BUCKET_NAME'])
     await handleContents(listObjectResponse, 0)
   } catch (e) {
     console.error(e)
