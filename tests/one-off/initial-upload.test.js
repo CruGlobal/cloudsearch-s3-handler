@@ -5,6 +5,7 @@ import cloudsearchService from '../../services/cloudsearch-service'
 import parsingService from '../../services/parsing-service'
 
 jest.mock('../../config/rollbar')
+// jest.unmock('aws-sdk')
 
 describe('Initial Upload', () => {
   /**
@@ -12,7 +13,7 @@ describe('Initial Upload', () => {
    */
   describe('Actual upload', () => {
     xit('uploads all of the HTML pages from an S3 bucket', async () => {
-      jest.unmock('aws-sdk') // unmock for the real thing
+      // In order for this to work, uncomment jest.unmock('aws-sdk') above
       jest.setTimeout(300000) // 5 minute timeout
       await uploader()
     })

@@ -10,10 +10,9 @@ const s3 = new AWS.S3()
 /**
  * Handles an incoming S3 response (from s3.getObject()).
  */
-const handleDocument = async (document) => {
-  // TODO: Implement
+const handleDocument = async (document, srcKey) => {
   if (document.ContentType === 'text/html') {
-    const searchObject = await parsingService.parseDocument(document)
+    const searchObject = await parsingService.parseDocument(document.Body.toString(), srcKey)
     await cloudsearchService.sendSingleItemToCloudsearch(searchObject)
   }
 }
@@ -29,7 +28,7 @@ export const handler = async (lambdaEvent) => {
     }
 
     const document = await s3.getObject(params).promise()
-    await handleDocument(document)
+    await handleDocument(document, srcKey)
     return 'true'
   } catch (error) {
     await rollbar.error('handler error', error, { lambdaEvent })

@@ -34,6 +34,8 @@
     "webpack-node-externals": "^1.6.0"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "htmlparser2": "^4.1.0",
     "lodash": "^4.17.15",
     "rollbar": "^2.16.2",
     "source-map-support": "^0.5.13"

@@ -32,13 +32,11 @@ AWS.S3.prototype = {
         promise: () => Promise.reject(new Error('Failed to get object.'))
       }
     } else if (params.Key === 'uploadFail') {
-      // Note: this is not a realistic response, but will make testing easier until the parsing is done
-      // TODO: Rework when parsing logic is complete
       return {
         promise: () => Promise.resolve({
           path: 'fail',
           ContentType: 'text/html',
-          Body: mockHtml
+          Body: Buffer.from(mockHtml)
         })
       }
     } else if (params.Key === 'image') {
@@ -53,7 +51,7 @@ AWS.S3.prototype = {
         promise: () => Promise.resolve({
           path: `https://some-site.com/${params.Key}`,
           ContentType: 'text/html',
-          Body: mockHtml
+          Body: Buffer.from(mockHtml)
         })
       }
     }
