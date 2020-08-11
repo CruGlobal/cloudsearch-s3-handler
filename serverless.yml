@@ -34,7 +34,7 @@ functions:
   s3event:
     handler: handlers/event.handler
     events:
-      - s3:
+      - existingS3:
           # See https://www.serverless.com/framework/docs/providers/aws/events/s3/
           bucket: ${env:S3_BUCKET_NAME}
           existing: true
