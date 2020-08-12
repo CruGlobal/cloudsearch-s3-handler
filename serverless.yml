@@ -23,8 +23,10 @@ provider:
       Resource: ${env:CLOUDSEARCH_DOMAIN_ARN}
     - Effect: Allow
       Action:
-        - S3:GetObject
-        - S3:ListBucket
+        - s3:GetObject
+        - s3:ListBucket
+        - s3:GetBucketNotification
+        - s3:PutBucketNotification
       Resource:
         - arn:aws:s3:::${env:S3_BUCKET_NAME}
         - arn:aws:s3:::${env:S3_BUCKET_NAME}/*
@@ -34,11 +36,11 @@ functions:
   s3event:
     handler: handlers/event.handler
     events:
-      - s3:
-          # See https://www.serverless.com/framework/docs/providers/aws/events/s3/
+      - existingS3:
+          # See https://www.npmjs.com/package/serverless-plugin-existing-s3
           bucket: ${env:S3_BUCKET_NAME}
-          existing: true
-          event: s3:ObjectCreated:*
+          events:
+            - s3:ObjectCreated:*
           rules:
             - suffix: .html
 
@@ -52,8 +54,14 @@ package:
 
 plugins:
   - serverless-webpack
+  - serverless-plugin-existing-s3
+  - serverless-plugin-scripts
 
 custom:
+  scripts:
+    hooks:
+      # Run s3deploy command
+      'aws:deploy:finalize:cleanup': 'npx serverless --stage $ENVIRONMENT s3deploy'
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
