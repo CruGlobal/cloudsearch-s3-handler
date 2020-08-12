@@ -55,6 +55,7 @@ package:
 plugins:
   - serverless-webpack
   - serverless-plugin-existing-s3
+  - serverless-plugin-scripts
 
 custom:
   scripts:
