@@ -39,7 +39,8 @@ functions:
       - existingS3:
           # See https://www.npmjs.com/package/serverless-plugin-existing-s3
           bucket: ${env:S3_BUCKET_NAME}
-          event: s3:ObjectCreated:*
+          events:
+            - s3:ObjectCreated:*
           rules:
             - suffix: .html
 
