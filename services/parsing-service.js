@@ -21,6 +21,7 @@ const parseDocument = async (document, srcKey) => {
     path: path,
     title: title,
     description: description,
+    has_description: description ? 1 : 0,
     body: body,
     'image_url': imageUrl,
     'published_date': publishedDate
