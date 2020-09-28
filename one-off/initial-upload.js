@@ -16,7 +16,7 @@ const listObjects = async (continuationToken, s3Bucket) => {
   }
 }
 
-const handleContents = async (listObjectResponse, lastIndex) => {
+const handleContents = async (listObjectResponse, lastIndex, s3Bucket) => {
   if (!listObjectResponse.Contents) {
     throw new Error(`Empty Contents: ${JSON.stringify(listObjectResponse)}`)
   }
@@ -39,18 +39,20 @@ const handleContents = async (listObjectResponse, lastIndex) => {
     }
   }
 
-  await cloudsearchService.sendBatchToCloudSearch(batch)
+  if (batch.length > 0) {
+    await cloudsearchService.sendBatchToCloudSearch(batch)
+  }
 
   if (listObjectResponse.IsTruncated) {
-    const paginatedResponse = await listObjects(listObjectResponse.NextContinuationToken)
-    await handleContents(paginatedResponse, i + lastIndex)
+    const paginatedResponse = await listObjects(listObjectResponse.NextContinuationToken, s3Bucket)
+    await handleContents(paginatedResponse, i + lastIndex, s3Bucket)
   }
 }
 
 module.exports = async (s3Bucket) => {
   try {
     const listObjectResponse = await listObjects(null, s3Bucket || process.env['S3_BUCKET_NAME'])
-    await handleContents(listObjectResponse, 0)
+    await handleContents(listObjectResponse, 0, s3Bucket || process.env['S3_BUCKET_NAME'])
   } catch (e) {
     console.error(e)
     throw e
