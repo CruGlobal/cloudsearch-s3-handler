@@ -17,7 +17,7 @@ const handleDocument = async (document, srcKey) => {
   }
 }
 
-export const handler = async (lambdaEvent) => {
+const handler = async (lambdaEvent) => {
   try {
     const srcBucket = lambdaEvent['Records'][0].s3.bucket.name
     const srcKey = decodeURIComponent(lambdaEvent.Records[0].s3.object.key.replace(/\+/g, ' '))
