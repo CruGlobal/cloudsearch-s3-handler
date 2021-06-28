@@ -49,7 +49,7 @@ const handleContents = async (listObjectResponse, lastIndex, s3Bucket) => {
   }
 }
 
-module.exports = async (s3Bucket) => {
+export default async (s3Bucket) => {
   try {
     const listObjectResponse = await listObjects(null, s3Bucket || process.env['S3_BUCKET_NAME'])
     await handleContents(listObjectResponse, 0, s3Bucket || process.env['S3_BUCKET_NAME'])

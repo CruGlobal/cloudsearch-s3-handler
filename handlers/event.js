@@ -36,7 +36,7 @@ const handler = async (lambdaEvent) => {
   }
 }
 
-module.exports = {
-  handler: handler,
-  handleDocument: handleDocument
+export default {
+  handler,
+  handleDocument
 }
