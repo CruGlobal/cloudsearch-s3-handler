@@ -72,8 +72,8 @@ const sendBatchToCloudSearch = async (searchObjects) => {
   return sendToCloudsearch(searchDocument)
 }
 
-module.exports = {
-  sendSingleItemToCloudsearch: sendSingleItemToCloudsearch,
-  sendBatchToCloudSearch: sendBatchToCloudSearch,
-  buildId: buildId
+export default {
+  sendSingleItemToCloudsearch,
+  sendBatchToCloudSearch,
+  buildId
 }
