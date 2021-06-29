@@ -166,4 +166,4 @@ AWS.CloudSearchDomain.prototype = {
 }
 
 // Export my AWS function so it can be referenced via requires
-module.exports = AWS
+export default AWS

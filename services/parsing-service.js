@@ -39,7 +39,7 @@ const buildPath = (srcKey) => {
   }
 }
 
-module.exports = {
-  parseDocument: parseDocument,
-  buildPath: buildPath
+export default {
+  parseDocument,
+  buildPath
 }

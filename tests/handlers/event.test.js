@@ -1,7 +1,7 @@
 'use strict'
 
 import rollbar from '../../config/rollbar'
-import * as eventHandler from '../../handlers/event'
+import eventHandler from '../../handlers/event'
 import cloudsearchService from '../../services/cloudsearch-service'
 import parsingService from '../../services/parsing-service'
 import fs from 'fs'
