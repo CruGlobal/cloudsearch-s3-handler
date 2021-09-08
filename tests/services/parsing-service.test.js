@@ -20,6 +20,7 @@ describe('Parsing Service', () => {
       expect(searchObject.body.indexOf('University of Nebraska–Lincoln student and part-time')).not.toEqual(-1)
       expect(searchObject.image_url).toEqual('https://mysite.com/og/default.png')
       expect(searchObject.published_date).not.toBeNull()
+      expect(searchObject.path_literal).not.toBeNull()
     })
   })
 
