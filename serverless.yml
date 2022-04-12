@@ -1,6 +1,7 @@
 service: cloudsearch-s3-handler
 frameworkVersion: '3'
-configValidationMode: error
+# Set to `warn` or it errors on the custom event type on s3
+configValidationMode: warn
 plugins:
   - serverless-webpack
   - serverless-plugin-existing-s3
