@@ -1,14 +1,22 @@
 service: cloudsearch-s3-handler
+frameworkVersion: '3'
+configValidationMode: error
+plugins:
+  - serverless-webpack
+  - serverless-plugin-existing-s3
+  - serverless-plugin-scripts
 
 provider:
   name: aws
   stage: ${env:ENVIRONMENT}
-  runtime: nodejs12.x
   region: us-east-1
   vpc:
     securityGroupIds:
-      - ${file(${env:ECS_CONFIG}/bin/vars.yml):us-east-1.webapp_elb_sg}
-    subnetIds: ${file(${env:ECS_CONFIG}/bin/vars.yml):us-east-1.prod_apps_1_all}
+      - sg-888294ed
+    subnetIds:
+      - subnet-f2c2dfda # us-east-1a
+      - subnet-1508db62 # us-east-1b
+      - subnet-3fd94266 # us-east-1c
   stackTags:
     Name: ${env:PROJECT_NAME}-${self:custom.environmentMap.${env:ENVIRONMENT}}
     owner: apps@cru.org
@@ -16,21 +24,58 @@ provider:
     env: ${self:custom.environmentMap.${env:ENVIRONMENT}}
     managed_by: serverless-framework
     function: lambda
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - CloudDearch:Document
-      Resource: ${env:CLOUDSEARCH_DOMAIN_ARN}
-    - Effect: Allow
-      Action:
-        - s3:GetObject
-        - s3:ListBucket
-        - s3:GetBucketNotification
-        - s3:PutBucketNotification
-      Resource:
-        - arn:aws:s3:::${env:S3_BUCKET_NAME}
-        - arn:aws:s3:::${env:S3_BUCKET_NAME}/*
-  environment: ${file(serverless/environment.js)}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - CloudDearch:Document
+          Resource: ${env:CLOUDSEARCH_DOMAIN_ARN}
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:ListBucket
+            - s3:GetBucketNotification
+            - s3:PutBucketNotification
+          Resource:
+            - arn:aws:s3:::${env:S3_BUCKET_NAME}
+            - arn:aws:s3:::${env:S3_BUCKET_NAME}/*
+  layers:
+    - arn:aws:lambda:us-east-1:072686360478:layer:node-16_14_2:1
+  environment: ${file(env.js)}
+
+package:
+  individually: true
+  patterns:
+    - '!.webpack/**'
+    - '!test/**'
+    - '!**/*.test.js'
+    - '!.deployment/**'
+
+custom:
+  scripts:
+    hooks:
+      # Run s3deploy command
+      'aws:deploy:finalize:cleanup': 'npx serverless s3deploy'
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+    packager: yarn
+    excludeFiles: '**/*.test.js'
+    excludeRegex: \.ts|test|\.map
+  environmentMap:
+    production: prod
+    staging: stage
+    development: dev
+    lab: lab
+
+resources:
+  extensions:
+    IamRoleLambdaExecution:
+      Properties:
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess
 
 functions:
   s3event:
@@ -43,40 +88,3 @@ functions:
             - s3:ObjectCreated:*
           rules:
             - suffix: .html
-
-package:
-  individually: true
-  exclude:
-    - .git/**
-    - test/**
-    - '**/*.test.js'
-    - .deployment/**
-
-plugins:
-  - serverless-webpack
-  - serverless-plugin-existing-s3
-  - serverless-plugin-scripts
-
-custom:
-  scripts:
-    hooks:
-      # Run s3deploy command
-      'aws:deploy:finalize:cleanup': 'npx serverless --stage $ENVIRONMENT s3deploy'
-  webpack:
-    webpackConfig: ./webpack.config.js
-    includeModules: true
-    packager: yarn
-    excludeFiles: '**/*.test.js'
-  environmentMap:
-    production: prod
-    staging: stage
-    development: dev
-    lab: lab
-
-resources:
-  Resources:
-    IamRoleLambdaExecution:
-      Properties:
-        ManagedPolicyArns:
-          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
-          - arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess

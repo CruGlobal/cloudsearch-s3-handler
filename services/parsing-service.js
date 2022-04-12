@@ -23,8 +23,8 @@ const parseDocument = async (document, srcKey) => {
     description: description,
     has_description: description ? 1 : 0,
     body: body,
-    'image_url': imageUrl,
-    'published_date': publishedDate,
+    image_url: imageUrl,
+    published_date: publishedDate,
     path_literal: path
   }
 }
@@ -32,11 +32,11 @@ const parseDocument = async (document, srcKey) => {
 const buildPath = (srcKey) => {
   const positionOfIndex = srcKey.indexOf('index.html')
   if (positionOfIndex === 0) {
-    return process.env['SITE_URL']
+    return process.env.SITE_URL
   } else if (positionOfIndex !== -1) {
-    return `${process.env['SITE_URL']}/${srcKey.substring(0, positionOfIndex - 1)}`
+    return `${process.env.SITE_URL}/${srcKey.substring(0, positionOfIndex - 1)}`
   } else {
-    return `${process.env['SITE_URL']}/${srcKey}`
+    return `${process.env.SITE_URL}/${srcKey}`
   }
 }
 
