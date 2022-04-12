@@ -29,7 +29,7 @@ describe('Initial Upload', () => {
       const mockParsed = {
         title: 'My Title',
         body: 'staff member aims to guide a wave of incoming students toward transformation',
-        'published_date': '2020-07-06T19:27:03.000Z'
+        published_date: '2020-07-06T19:27:03.000Z'
       }
 
       jest.spyOn(cloudsearchService, 'sendBatchToCloudSearch').mockImplementation(() => {})
@@ -45,11 +45,11 @@ describe('Initial Upload', () => {
       expect(cloudsearchService.sendBatchToCloudSearch).toHaveBeenCalledTimes(2)
 
       mockParsed.path = 'https://some-site.com/page.html'
-      const firstExpectedBatch = [ mockParsed ]
+      const firstExpectedBatch = [mockParsed]
       expect(cloudsearchService.sendBatchToCloudSearch).toHaveBeenCalledWith(firstExpectedBatch)
 
       mockParsed.path = 'https://some-site.com/another-page.html'
-      const secondExpectedBatch = [ mockParsed ]
+      const secondExpectedBatch = [mockParsed]
       expect(cloudsearchService.sendBatchToCloudSearch).toHaveBeenCalledWith(secondExpectedBatch)
     })
 

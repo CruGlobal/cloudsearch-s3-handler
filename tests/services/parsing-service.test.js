@@ -27,17 +27,17 @@ describe('Parsing Service', () => {
   describe('buildPath', () => {
     it('should handle the home page', () => {
       const path = parsingService.buildPath('index.html')
-      expect(path).toEqual(process.env['SITE_URL'])
+      expect(path).toEqual(process.env.SITE_URL)
     })
 
     it('should handle path for deeper page', () => {
       const path = parsingService.buildPath('some/page/path/index.html')
-      expect(path).toEqual(`${process.env['SITE_URL']}/some/page/path`)
+      expect(path).toEqual(`${process.env.SITE_URL}/some/page/path`)
     })
 
     it('should handle non-index.html path', () => {
       const path = parsingService.buildPath('some/page.html')
-      expect(path).toEqual(`${process.env['SITE_URL']}/some/page.html`)
+      expect(path).toEqual(`${process.env.SITE_URL}/some/page.html`)
     })
   })
 })

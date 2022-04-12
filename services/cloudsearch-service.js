@@ -5,7 +5,7 @@ import AWS from 'aws-sdk'
 import crypto from 'crypto'
 
 const MAX_ID_SIZE = 128
-const cloudsearch = new AWS.CloudSearchDomain({ endpoint: process.env['CLOUDSEARCH_DOCUMENT_ENDPOINT'] })
+const cloudsearch = new AWS.CloudSearchDomain({ endpoint: process.env.CLOUDSEARCH_DOCUMENT_ENDPOINT })
 
 /**
  * Returns either the page URL or an MD5 hashed ID if the URL is longer than 128 characters.
@@ -32,9 +32,9 @@ const sendToCloudsearch = async (searchDocuments) => {
 
   const data = await cloudsearch.uploadDocuments(cloudsearchRequest).promise()
   if (data.warnings) {
-    data.warnings.map(warning => {
+    data.warnings.map(warning =>
       rollbar.warn(`Warning from batch upload: ${warning.message}`)
-    })
+    )
   }
   return `Added ${data.adds} documents.`
 }
@@ -61,13 +61,13 @@ const sendSingleItemToCloudsearch = async (searchObject) => {
  */
 const sendBatchToCloudSearch = async (searchObjects) => {
   const searchDocument = []
-  searchObjects.map(searchObject => {
+  searchObjects.map(searchObject =>
     searchDocument.push({
       id: buildId(searchObject.path),
       type: 'add',
       fields: searchObject
     })
-  })
+  )
 
   return sendToCloudsearch(searchDocument)
 }
